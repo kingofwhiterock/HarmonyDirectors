@@ -1,18 +1,22 @@
-日本語訳は、下部に記載してあります。
 # Harmony Directors
 ## Overview
 ## Usage
 ## System Requirement
+* Core System
+    * `Python == 3.8.3 or later`
+* Libraries
+    * `numpy == 1.18.1 or later`
+    * `librosa == 0.6.3 or later`
+    * `matplotlib == 3.1.3 or later`
+
+Depended packages are also needed.
+
 ## Developing now
+* sound generating and playing
+* chord analyzing
+* and more...
+
 ## Caution
+* Copyright 2020 Apoi All rights reserved.
+* We don't bear any responsibility for using these files.
 ## Special Thanks
-
-
-# ハーモニーディレクター
-## 概要
-## 使用方法
-## システム要件
-## 開発中の機能
-## お断り
-## スペシャルサンクス
-
