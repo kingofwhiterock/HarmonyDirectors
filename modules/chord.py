@@ -36,7 +36,7 @@ class ChordLetters(object):
     """
     To return the chord letters from the given notes
     """
-    def __init__(self, data: list, root: int = None, sharp: bool = False, *args, **kwargs):
+    def __init__(self, sharp: bool = False, *args, **kwargs):
 
         # Correspondence between pitches and numbers
         if sharp:
@@ -50,19 +50,17 @@ class ChordLetters(object):
                      'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11, '': -1}
 
         # init the others
-        self.data = data
-        self.root = root
         self.args = args
         self.kwargs = kwargs
 
-    def notes_to_chord(self) -> list:
+    def notes_to_chord(self, data: list, root: int = None) -> list:
         """
         To return the chord letters (for triad, seventh and ninth)
 
         :return: list
         """
 
-        elements_num = len(self.data)
+        elements_num = len(data)
 
         # chord appropriateness check
         if elements_num < 3:
@@ -80,18 +78,19 @@ class ChordLetters(object):
             chord_set = [[0, 4, 7, 10], [0, 4, 7, 11], [0, 3, 7, 10], [0, 3, 7, 11],
                          [0, 3, 6, 10], [0, 3, 6, 9], [0, 4, 8, 11], [0, 5, 7, 10],
                          [0, 4, 7, 9], [0, 3, 7, 9], [0, 2, 4, 7], [0, 4, 5, 7],
-                         [0, 4, 6, 10], [0, 4, 8, 10]]
-            chord_name = {0: '7', 1: 'M7', 2: 'm7', 3: 'mM7', 4: 'm7-5', 5: 'dim7', 6: 'M7+5', 7: '7sus4',
-                          8: '6', 9: 'm6', 10: '(add9)', 11: '(add4)', 12: '7-5', 13: 'aug7', -1: ''}
+                         [0, 4, 6, 10], [0, 4, 8, 10], [0, 3, 6, 11]]
+            chord_name = {0: '7', 1: 'M7', 2: 'm7', 3: 'mM7', 4: 'm7-5', 5: 'dim7', 6: 'augM7', 7: '7sus4',
+                          8: '6', 9: 'm6', 10: '(add9)', 11: '(add4)', 12: '7-5', 13: 'aug7', 14: 'dimM7', -1: ''}
 
         else:
             chord_set = [[0, 2, 4, 7, 10], [0, 1, 4, 7, 10], [0, 3, 4, 7, 10], [0, 4, 5, 7, 10], [0, 3, 5, 7, 10],
                          [0, 4, 6, 7, 10], [0, 4, 6, 7, 11], [0, 4, 7, 9, 10], [0, 4, 7, 8, 10], [0, 2, 4, 7, 9],
-                         [0, 2, 3, 7, 9]]
+                         [0, 2, 3, 7, 9], [0, 2, 4, 6, 10], [0, 1, 4, 8, 10], [0, 2, 4, 8, 10], [0, 2, 3, 7, 10]]
             chord_name = {0: '9', 1: '7(b9)', 2: '7(b10)', 3: '7(11)', 4: 'm7(11)', 5: '7(#11)', 6: 'M7(#11)',
-                          7: '7(13)', 8: '7(b13)', 9: '69', 10: 'm69', -1: ''}
+                          7: '7(13)', 8: '7(b13)', 9: '69', 10: 'm69', 11: '9-5', 12: 'aug7-9', 13: 'aug9',
+                          14: 'm9', -1: ''}
 
-        tmp = sorted(self.data.copy())
+        tmp = sorted(data.copy())
         ans = []
 
         # each elements assume the root
@@ -104,8 +103,8 @@ class ChordLetters(object):
             for i, j in enumerate(chord_set):
                 if j == tmp_1:
                     # slash code
-                    if self.root is not None and self.root != root_tmp:
-                        ans.append('{}{}/{}'.format(self.ntoc[root_tmp], chord_name[i], self.ntoc[self.root]))
+                    if root is not None and root != root_tmp:
+                        ans.append('{}{}/{}'.format(self.ntoc[root_tmp], chord_name[i], self.ntoc[root]))
                         break
 
                     else:
@@ -116,7 +115,4 @@ class ChordLetters(object):
 
 
 if __name__ == '__main__':
-    data = list(map(int, input().split()))
-    root = None
-    cl = ChordLetters(data, root, sharp=False)
-    print(cl.notes_to_chord())
+    pass
