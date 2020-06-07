@@ -4,7 +4,7 @@
 #
 # 2020/06/02
 # written by: Apoi
-# version: 0.1.0
+# version: 0.1.1
 #
 # ##################################################
 #
@@ -36,28 +36,26 @@ class ChordLetters(object):
     """
     To return the chord letters from the given notes
     """
-    def __init__(self, data: list, root: int = None, *args, **kwargs):
+    def __init__(self, data: list, root: int = None, sharp: bool = False, *args, **kwargs):
 
         # Correspondence between pitches and numbers
-        self.ntoc = {0: 'C', 1: 'C#', 2: 'D', 3: 'D#', 4: 'E', 5: 'F',
-                     6: 'F#', 7: 'G', 8: 'G#', 9: 'A', 10: 'A#', 11: 'B', -1: ''}
-
-        self.ntocb = {0: 'C', 1: 'Db', 2: 'D', 3: 'Eb', 4: 'E', 5: 'F',
-                      6: 'Gb', 7: 'G', 8: 'Ab', 9: 'A', 10: 'Bb', 11: 'B', -1: ''}
+        if sharp:
+            self.ntoc = {0: 'C', 1: 'C#', 2: 'D', 3: 'D#', 4: 'E', 5: 'F',
+                         6: 'F#', 7: 'G', 8: 'G#', 9: 'A', 10: 'A#', 11: 'B', -1: ''}
+        else:
+            self.ntoc = {0: 'C', 1: 'Db', 2: 'D', 3: 'Eb', 4: 'E', 5: 'F',
+                         6: 'Gb', 7: 'G', 8: 'Ab', 9: 'A', 10: 'Bb', 11: 'B', -1: ''}
 
         self.cton = {'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4,  'F': 5, 'F#': 6,
                      'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11, '': -1}
 
         # init the others
         self.data = data
-
         self.root = root
-
         self.args = args
-
         self.kwargs = kwargs
 
-    def main(self) -> list:
+    def notes_to_chord(self) -> list:
         """
         To return the chord letters (for triad, seventh and ninth)
 
@@ -96,33 +94,29 @@ class ChordLetters(object):
         tmp = sorted(self.data.copy())
         ans = []
 
-        # with root
-        if self.root is not None:
-            tmp = list(map(lambda x: (x - self.root) % 12, tmp))
-            tmp = sorted(tmp)
+        # each elements assume the root
+        for trs in range(elements_num):
+            root_tmp = tmp[trs]
+            tmp_1 = list(map(lambda x: (x - root_tmp) % 12, tmp))
+            tmp_1 = sorted(tmp_1)
+
+            # search chords
             for i, j in enumerate(chord_set):
-                if j == tmp:
-                    ans.append('{}{}'.format(self.ntoc[self.root], chord_name[i]))
-                    break
+                if j == tmp_1:
+                    # slash code
+                    if self.root is not None and self.root != root_tmp:
+                        ans.append('{}{}/{}'.format(self.ntoc[root_tmp], chord_name[i], self.ntoc[self.root]))
+                        break
 
-            return ans
-
-        # without root
-        else:
-            # each elements assume the root
-            for trs in range(elements_num):
-                root_tmp = tmp[trs]
-                tmp_1 = list(map(lambda x: (x - root_tmp) % 12, tmp))
-                tmp_1 = sorted(tmp_1)
-
-                # search chords
-                for i, j in enumerate(chord_set):
-                    if j == tmp_1:
+                    else:
                         ans.append('{}{}'.format(self.ntoc[root_tmp], chord_name[i]))
                         break
 
-            return ans
+        return ans
 
 
 if __name__ == '__main__':
-    pass
+    data = list(map(int, input().split()))
+    root = None
+    cl = ChordLetters(data, root, sharp=False)
+    print(cl.notes_to_chord())
