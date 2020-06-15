@@ -26,7 +26,7 @@ import json
 # ##################################################
 # python file importing
 # ##################################################
-from modules.err import ChordSyntaxError, NotesCharacterError
+from harmonydirectors.err import ChordSyntaxError, NotesCharacterError
 # ##################################################
 # class
 # ##################################################
@@ -169,7 +169,7 @@ class ChordLetters(object):
             raise ChordSyntaxError('\'%s\' is an invalid chord symbol.' % chord)
 
         # load chord_dict.json
-        with open('chord_dict.json', mode='r', encoding='utf-8') as f:
+        with open('const/chord_dict.json', mode='r', encoding='utf-8') as f:
             cd = json.load(f)
 
         # searching

@@ -1,5 +1,6 @@
 # Harmony Directors
 ## Overview
+`Harmony Directors` is a new python library that allows you to handle various things about music and its chords.
 ## Usage
 ## System Requirement
 * Core System
@@ -19,4 +20,3 @@ Depended packages are also needed.
 ## Caution
 * Copyright 2020 Apoi All rights reserved.
 * We don't bear any responsibility for using these files.
-## Special Thanks
