@@ -83,7 +83,6 @@ class ChordLetters(object):
 
         :return: list
         """
-        # TODO: use chord_dict.json for notes_to_chord()
 
         elements_num = len(data)
 
@@ -94,46 +93,40 @@ class ChordLetters(object):
         if elements_num > 5:
             return []
 
+        # load json
+        with open('const/chord_dict.json', mode='r', encoding='utf-8') as f:
+            raw = json.load(f)
+
         # constant data
         if elements_num == 3:
-            chord_set = [[0, 4, 7], [0, 3, 7], [0, 3, 6], [0, 4, 8], [0, 5, 7], [0, 4, 6]]
-            chord_name = {0: '', 1: 'm', 2: 'dim', 3: 'aug', 4: 'sus4', 5: '-5', -1: ''}
+            chord_set: dict = raw['triad']
 
         elif elements_num == 4:
-            chord_set = [[0, 4, 7, 10], [0, 4, 7, 11], [0, 3, 7, 10], [0, 3, 7, 11],
-                         [0, 3, 6, 10], [0, 3, 6, 9], [0, 4, 8, 11], [0, 5, 7, 10],
-                         [0, 4, 7, 9], [0, 3, 7, 9], [0, 2, 4, 7], [0, 4, 5, 7],
-                         [0, 4, 6, 10], [0, 4, 8, 10], [0, 3, 6, 11]]
-            chord_name = {0: '7', 1: 'M7', 2: 'm7', 3: 'mM7', 4: 'm7-5', 5: 'dim7', 6: 'augM7', 7: '7sus4',
-                          8: '6', 9: 'm6', 10: '(add9)', 11: '(add4)', 12: '7-5', 13: 'aug7', 14: 'dimM7', -1: ''}
+            chord_set: dict = raw['seventh']
 
         else:
-            chord_set = [[0, 2, 4, 7, 10], [0, 1, 4, 7, 10], [0, 3, 4, 7, 10], [0, 4, 5, 7, 10], [0, 3, 5, 7, 10],
-                         [0, 4, 6, 7, 10], [0, 4, 6, 7, 11], [0, 4, 7, 9, 10], [0, 4, 7, 8, 10], [0, 2, 4, 7, 9],
-                         [0, 2, 3, 7, 9], [0, 2, 4, 6, 10], [0, 1, 4, 8, 10], [0, 2, 4, 8, 10], [0, 2, 3, 7, 10]]
-            chord_name = {0: '9', 1: '7(b9)', 2: '7(b10)', 3: '7(11)', 4: 'm7(11)', 5: '7(#11)', 6: 'M7(#11)',
-                          7: '7(13)', 8: '7(b13)', 9: '69', 10: 'm69', 11: '9-5', 12: 'aug7-9', 13: 'aug9',
-                          14: 'm9', -1: ''}
+            chord_set: dict = raw['ninth']
 
+        chord_set = {i: sorted(x) for i, x in chord_set.items()}
         tmp = sorted(data.copy())
         ans = []
 
         # each elements assume the root
-        for trs in range(elements_num):
-            root_tmp = tmp[trs]
+        for trs in tmp:
+            root_tmp = trs
             tmp_1 = list(map(lambda x: (x - root_tmp) % 12, tmp))
             tmp_1 = sorted(tmp_1)
 
             # search chords
-            for i, j in enumerate(chord_set):
+            for i, j in chord_set.items():
                 if j == tmp_1:
                     # slash code
                     if root is not None and root != root_tmp:
-                        ans.append('{}{}/{}'.format(self.ntoc[root_tmp], chord_name[i], self.ntoc[root]))
+                        ans.append('{}{}/{}'.format(self.ntoc[root_tmp], i, self.ntoc[root]))
                         break
 
                     else:
-                        ans.append('{}{}'.format(self.ntoc[root_tmp], chord_name[i]))
+                        ans.append('{}{}'.format(self.ntoc[root_tmp], i))
                         break
 
         return ans
