@@ -26,15 +26,19 @@
 # ##################################################
 # python file importing
 # ##################################################
-
+from harmonydirectors.chord import ChordLetters
 # ##################################################
 # class
 # ##################################################
 
 
-class SoundGenerator(object):
+class SoundGenerator(ChordLetters):
     def __init__(self):
-        pass
+        super(SoundGenerator, self).__init__()
 
     def main(self):
         pass
+
+
+if __name__ == '__main__':
+    pass
