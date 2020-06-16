@@ -119,8 +119,8 @@ class ChordLetters(object):
         ans = []
 
         # each elements assume the root
-        for trs in range(elements_num):
-            root_tmp = tmp[trs]
+        for trs in tmp:
+            root_tmp = trs
             tmp_1 = list(map(lambda x: (x - root_tmp) % 12, tmp))
             tmp_1 = sorted(tmp_1)
 
