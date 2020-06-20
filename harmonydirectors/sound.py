@@ -33,10 +33,10 @@ from harmonydirectors.chord import ChordLetters
 
 
 class SoundGenerator(ChordLetters):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(SoundGenerator, self).__init__()
 
-    def main(self):
+    def create(self):
         pass
 
 

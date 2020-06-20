@@ -23,6 +23,7 @@
 # library importing
 # ##################################################
 import json
+import sys
 # ##################################################
 # python file importing
 # ##################################################
@@ -54,6 +55,65 @@ class ChordLetters(object):
         self.args = args
         self.kwargs = kwargs
 
+    def _chord_to_elem(self, chord: str) -> tuple:
+        """
+        To return notes which construct a given chord letter
+
+        Used to SoundGenerator, chord_to_ notes()
+
+        :param chord: chord letter you want to analyze
+        :return: tuple
+        """
+        # search root and calc transpose
+        root_char = chord[0]
+        try:
+            dif = self.cton[root_char]
+        except KeyError:
+            raise ChordSyntaxError('\'%s\' is an invalid chord symbol.' % chord)
+
+        if len(chord) > 1:
+            half_note = chord[1]
+            if half_note == '#' or half_note == 'b':
+                root_char += half_note
+                dif = self.cton[root_char]
+
+        # search bass
+        tmp = chord.split('/')
+        if len(tmp) == 1:
+            chord_main = tmp[0]
+            chord_bass = None
+        elif len(tmp) == 2:
+            chord_main = tmp[0]
+            chord_bass = tmp[1]
+        else:
+            raise ChordSyntaxError('\'%s\' is an invalid chord symbol.' % chord)
+
+        # load chord_dict.json
+        tmp = sys.path[-1] + '/harmonydirectors/const/chord_dict.json'
+        with open(tmp, mode='r', encoding='utf-8') as f:
+            cd = json.load(f)
+
+        # searching
+        elem = None
+        for t in ['triad', 'seventh', 'ninth']:
+            for name, elem in cd[t].items():
+                if root_char + name == chord_main:
+                    break
+            else:
+                continue
+            break
+        else:
+            elem = []
+
+        # convert elements -> note chars
+        elem = list(map(lambda x: (x + dif) % 12, elem))
+
+        # return
+        if chord_bass is not None:
+            return elem, self.cton[chord_bass], dif
+        else:
+            return elem, chord_bass, dif
+
     def char_to_array(self, data: (str, list)) -> list:
         """
         To convert a pitch name into array data
@@ -76,6 +136,24 @@ class ChordLetters(object):
             return tmp
 
         raise TypeError('param must be \'str\' or \'list\'')
+
+    def chord_to_notes(self, chord: str) -> dict:
+        """
+        To return notes which construct a given chord letter
+        :param chord: chord letter you want to analyze
+        :return: dict
+        """
+        # get elem and bass
+        elem, chord_bass, root_char = self._chord_to_elem(chord)
+
+        # convert elements -> note chars
+        elem = list(map(lambda x: self.ntoc[x], elem))
+
+        # return
+        if chord_bass is not None:
+            return {'chord': chord, 'main': elem, 'bass': chord_bass}
+        else:
+            return {'chord': chord, 'main': elem, 'bass': root_char}
 
     def notes_to_chord(self, data: list, root: int = None) -> list:
         """
@@ -130,62 +208,6 @@ class ChordLetters(object):
                         break
 
         return ans
-
-    def chord_to_notes(self, chord: str) -> dict:
-        """
-        To return notes which construct a given chord letter
-        :param chord: chord letter you want to analyze
-        :return: dict
-        """
-        # search root and calc transpose
-        root_char = chord[0]
-        try:
-            dif = self.cton[root_char]
-        except KeyError:
-            raise ChordSyntaxError('\'%s\' is an invalid chord symbol.' % chord)
-
-        if len(chord) > 1:
-            half_note = chord[1]
-            if half_note == '#' or half_note == 'b':
-                root_char += half_note
-                dif = self.cton[root_char]
-
-        # search bass
-        tmp = chord.split('/')
-        if len(tmp) == 1:
-            chord_main = tmp[0]
-            chord_bass = None
-        elif len(tmp) == 2:
-            chord_main = tmp[0]
-            chord_bass = tmp[1]
-        else:
-            raise ChordSyntaxError('\'%s\' is an invalid chord symbol.' % chord)
-
-        # load chord_dict.json
-        with open('const/chord_dict.json', mode='r', encoding='utf-8') as f:
-            cd = json.load(f)
-
-        # searching
-        elem = None
-        for t in ['triad', 'seventh', 'ninth']:
-            for name, elem in cd[t].items():
-                if root_char + name == chord_main:
-                    break
-            else:
-                continue
-            break
-        else:
-            elem = []
-
-        # convert elements -> note chars
-        elem = list(map(lambda x: (x + dif) % 12, elem))
-        elem = list(map(lambda x: self.ntoc[x], elem))
-
-        # return
-        if chord_bass is not None:
-            return {'chord': chord, 'main': elem, 'bass': chord_bass}
-        else:
-            return {'chord': chord, 'main': elem, 'bass': root_char}
 
 
 if __name__ == '__main__':
