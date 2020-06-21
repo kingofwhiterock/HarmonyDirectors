@@ -33,11 +33,30 @@ from harmonydirectors.chord import ChordLetters
 
 
 class SoundGenerator(ChordLetters):
-    def __init__(self, **kwargs):
+    """
+    To generate harmony of given note(s)
+
+    SoundGenerator is a subclass of ChordLetters.
+    """
+    def __init__(self):
         super(SoundGenerator, self).__init__()
 
-    def create(self):
+    def _create(self):
         pass
+
+    def create(self, sound, *,
+               single_tone: bool = False,
+               with_bass: bool = False,
+               transpose: int = 0,
+               octave: int = 0,
+               pitch: int = 440,
+               sec: float = 5.0,
+               sampling_rate: int = 441000,
+               volume_adjustment: (str, float) = 'auto',
+               title: str = 'sound.wav',
+               ):
+        if isinstance(sound, str):
+            pass
 
 
 if __name__ == '__main__':

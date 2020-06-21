@@ -22,8 +22,8 @@
 # ##################################################
 # library importing
 # ##################################################
+import os
 import json
-import sys
 # ##################################################
 # python file importing
 # ##################################################
@@ -89,7 +89,7 @@ class ChordLetters(object):
             raise ChordSyntaxError('\'%s\' is an invalid chord symbol.' % chord)
 
         # load chord_dict.json
-        tmp = sys.path[-1] + '/harmonydirectors/const/chord_dict.json'
+        tmp = os.path.dirname(__file__) + '/const/chord_dict.json'
         with open(tmp, mode='r', encoding='utf-8') as f:
             cd = json.load(f)
 
@@ -120,13 +120,13 @@ class ChordLetters(object):
         :param data: a pitch name (str or list)
         :return: list
         """
-        if type(data) == str:
+        if type(data) is str:
             try:
                 return [self.cton[data]]
             except KeyError:
                 raise NotesCharacterError('\'%s\' can\'t be used.' % data)
 
-        if type(data) == list:
+        if type(data) is list:
             tmp = []
             for i in data:
                 try:
@@ -151,9 +151,9 @@ class ChordLetters(object):
 
         # return
         if chord_bass is not None:
-            return {'chord': chord, 'main': elem, 'bass': chord_bass}
+            return {'chord': chord, 'main': elem, 'bass': self.ntoc[chord_bass]}
         else:
-            return {'chord': chord, 'main': elem, 'bass': root_char}
+            return {'chord': chord, 'main': elem, 'bass': self.ntoc[root_char]}
 
     def notes_to_chord(self, data: list, root: int = None) -> list:
         """
@@ -172,7 +172,8 @@ class ChordLetters(object):
             return []
 
         # load json
-        with open('const/chord_dict.json', mode='r', encoding='utf-8') as f:
+        tmp = os.path.dirname(__file__) + '/const/chord_dict.json'
+        with open(tmp, mode='r', encoding='utf-8') as f:
             raw = json.load(f)
 
         # constant data
