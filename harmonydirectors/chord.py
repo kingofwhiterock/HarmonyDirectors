@@ -59,7 +59,7 @@ class ChordLetters(object):
         """
         To return notes which construct a given chord letter
 
-        Used to SoundGenerator, chord_to_ notes()
+        Used to SoundGenerator, chord_to_notes()
 
         :param chord: chord letter you want to analyze
         :return: tuple

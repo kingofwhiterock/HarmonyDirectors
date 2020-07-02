@@ -20,7 +20,8 @@
 # --------------------------------------------------
 # library importing
 # --------------------------------------------------
-import setuptools
+# import setuptools
+from distutils.core import setup
 # --------------------------------------------------
 # python file importing
 # --------------------------------------------------
@@ -28,3 +29,12 @@ import setuptools
 # --------------------------------------------------
 # class
 # --------------------------------------------------
+setup(
+    name='harmonydirectors',
+    version='0.1.0',
+    description='Music and chord letters analysis.',
+    long_description='',
+    author='Apoi',
+    author_email='',
+    url='https://github.com/kingofwhiterock/HarmonyDirectors',
+)
