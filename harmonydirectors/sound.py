@@ -24,6 +24,7 @@
 # ##################################################
 import numpy as np
 from scipy.io import wavfile
+import re
 # ##################################################
 # python file importing
 # ##################################################
@@ -64,6 +65,7 @@ class SoundGenerator(ChordLetters):
         :return: None (wave file is generated in current directory or in specified directory)
         """
         # data substitution
+        # TODO: use other params
         inversion: int = data['inversion']
         single_tone: bool = data['single_tone']
         with_bass: bool = data['with_bass']
@@ -72,11 +74,47 @@ class SoundGenerator(ChordLetters):
         octave: int = data['octave']
         pitch: float = data['pitch']
         sec: float = data['sec']
-        sampling_rate: int = data['sec']
+        sampling_rate: int = data['sampling_rate']
         volume_adjustment: (str, float) = data['volume_adjustment']
         title: str = data['title']
         at: str = data['at']
 
+        # data sanitization
+        if pitch < 410 or 494 < pitch:
+            raise ValueError('\'pitch\' should be between 410 and 494.')
+
+        if not re.fullmatch(r'.+?\.wav$', title):
+            title += '.wav'
+
+        # elements' frequencies
+        # fn is a num the one before
+        fn = -1
+
+        # wave init
+        wave = SoundGenerator.oscillator(0, sec, sampling_rate)
+
+        # wave synthesize
+        for i in sound:
+            if fn >= i:
+                # 15 = 12(octave) + 3(C base-> A base convert)
+                f = pitch * 2 ** ((15 + i) / 12)
+            else:
+                f = pitch * 2 ** ((3 + i) / 12)
+            wave += SoundGenerator.oscillator(f, sec, sampling_rate)
+
+        # volume controlling
+        if volume_adjustment == 'auto':
+            wave *= 0.1
+        elif isinstance(volume_adjustment, (int, float)):
+            wave *= volume_adjustment
+        else:
+            ValueError('\'volume_adjustment\' should be \'auto\' or float.')
+
+        # wave convert
+        wave = (wave * float(2 ** 15 - 1)).astype(np.int16)
+
+        # make wave_file
+        wavfile.write(title, sampling_rate, wave)
 
     def create(self, sound, **kwargs):
         """
