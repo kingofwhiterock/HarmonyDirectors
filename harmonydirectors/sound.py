@@ -80,18 +80,21 @@ class SoundGenerator(ChordLetters):
         at: str = data['at']
 
         # data sanitization
+        if transpose < -11 or 11 < transpose:
+            raise ValueError('\'transpose\' should be between -11 and 11.')
+
         if pitch < 410 or 494 < pitch:
             raise ValueError('\'pitch\' should be between 410 and 494.')
 
         if not re.fullmatch(r'.+?\.wav$', title):
             title += '.wav'
 
+        # wave initialization
+        wave = SoundGenerator.oscillator(0, sec, sampling_rate)
+
         # elements' frequencies
         # fn is a num the one before
         fn = -1
-
-        # wave init
-        wave = SoundGenerator.oscillator(0, sec, sampling_rate)
 
         # wave synthesize
         for i in sound:
@@ -100,7 +103,11 @@ class SoundGenerator(ChordLetters):
                 f = pitch * 2 ** ((15 + i) / 12)
             else:
                 f = pitch * 2 ** ((3 + i) / 12)
+
             wave += SoundGenerator.oscillator(f, sec, sampling_rate)
+
+            # memory a number the one before
+            fn = i
 
         # volume controlling
         if volume_adjustment == 'auto':
@@ -116,36 +123,58 @@ class SoundGenerator(ChordLetters):
         # make wave_file
         wavfile.write(title, sampling_rate, wave)
 
-    def create(self, sound, **kwargs):
+    def create(self, sound, *args,
+               inversion: int = 0,
+               single_tone: bool = False,
+               with_bass: bool = False,
+               bass_note: int = -1,
+               transpose: int = 0,
+               octave: int = 0,
+               pitch: float = 440.0,
+               sec: float = 5.0,
+               sampling_rate: int = 441000,
+               volume_adjustment: (str, float) = 'auto',
+               title: str = 'sound.wav',
+               at: str = None
+               ):
         """
         To manage sound creation
 
-        :param sound: note character(s) or chord letters
-
-        :param kwargs: Some parameters can be used.
-                       See docs and check available parameters and their default values.
-
-        :return: None (wave file is generated in current directory or in specified directory)
+        :param sound: sound note(s), chord symbol you want to create
+        :param args: DO NOT USE this param, info in this param will be ignored.
+        :param inversion: root -> 0, first to fourth inversion -> 1 to 4
+        :param single_tone: It should be True when a letter in param 'sound' is a single tone, not a chord.
+        :param with_bass: It should be True when bass sound is also needed.
+        :param bass_note: If param 'with_bass' is True, bass sound in this param will be added.
+        :param transpose: A value of transposing can be set. The value must be between -11 and 11.
+        :param octave: A value of octave transposing (= transpose +-12) can be set.
+        :param pitch: mid A's pitch
+        :param sec: length of wave
+        :param sampling_rate: wave sampling rate. If you are not a sound engineer, default value is recommended.
+        :param volume_adjustment: preventing sound cracking. 'auto'(default) is recommended.
+        :param title: wave file's title. If 'title' does not end with '.wav', '.wav' is automatically added.
+        :param at: specifying wave file's path
+        :return: None (wave file is created.)
         """
-        # kwargs control
-        data = {'inversion': 0,
-                'single_tone': False,
-                'with_bass': False,
-                'bass_note': -1,
-                'transpose': 0,
-                'octave': 0,
-                'pitch': 440.0,
-                'sec': 5.0,
-                'sampling_rate':  441000,
-                'volume_adjustment': 'auto',
-                'title': 'sound.wav',
-                'at': None}
 
-        for k, v in kwargs.items():
-            if k == 'bass_note' and isinstance(v, str):
-                data[k] = self.cton[v]
-            else:
-                data[k] = v
+        # kwargs control
+        data = {'inversion': inversion,
+                'single_tone': single_tone,
+                'with_bass': with_bass,
+                'bass_note': bass_note,
+                'transpose': transpose,
+                'octave': octave,
+                'pitch': pitch,
+                'sec': sec,
+                'sampling_rate': sampling_rate,
+                'volume_adjustment': volume_adjustment,
+                'title': title,
+                'at': at,
+                'others': args}
+
+        # data sanitization
+        if isinstance(data['bass_note'], str):
+            data['bass_note'] = self.cton[data['bass_note']]
 
         # param sound check
         if isinstance(sound, str):
