@@ -9,13 +9,13 @@
 # ##################################################
 #
 # PROJECT:
-#
+# HarmonyDirectors
 #
 # FILE PURPOSE:
-#
+# create sound wave file
 #
 # FILE ISSUE:
-#
+# None
 #
 # ##################################################
 
@@ -24,6 +24,7 @@
 # ##################################################
 import numpy as np
 from scipy.io import wavfile
+import os
 import re
 # ##################################################
 # python file importing
@@ -79,22 +80,25 @@ class SoundGenerator(ChordLetters):
         title: str = data['title']
         at: str = data['at']
 
-        # data sanitization
+        # -*- data sanitization -*-
+        # transpose range
         if transpose < -11 or 11 < transpose:
             raise ValueError('\'transpose\' should be between -11 and 11.')
 
+        # pitch range
         if pitch < 410 or 494 < pitch:
             raise ValueError('\'pitch\' should be between 410 and 494.')
 
+        # file title regulation
         if not re.fullmatch(r'.+?\.wav$', title):
             title += '.wav'
 
         # wave initialization
         wave = SoundGenerator.oscillator(0, sec, sampling_rate)
+        # -*- end of the data sanitization -*-
 
         # elements' frequencies
-        # fn is a num the one before
-        fn = -1
+        fn = -1  # fn is a num the one before
 
         # wave synthesize
         for i in sound:
@@ -120,10 +124,17 @@ class SoundGenerator(ChordLetters):
         # wave convert
         wave = (wave * float(2 ** 15 - 1)).astype(np.int16)
 
-        # make wave_file
-        wavfile.write(title, sampling_rate, wave)
+        # path management
+        if at is None:
+            pth = os.path.join(os.getcwd(), title)
+        else:
+            os.chdir(at)
+            pth = os.path.join(os.getcwd(), title)
 
-    def create(self, sound, *args,
+        # make wave_file
+        wavfile.write(pth, sampling_rate, wave)
+
+    def create(self, sound: object, *args,
                inversion: int = 0,
                single_tone: bool = False,
                with_bass: bool = False,

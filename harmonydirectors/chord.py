@@ -37,15 +37,12 @@ class ChordLetters(object):
     """
     To return chord letters from the given notes
     """
-    def __init__(self, sharp: bool = False, *args, **kwargs):
+    def __init__(self, sharp: tuple = tuple(False for _ in range(5)), *args, **kwargs):
 
         # Correspondence between pitches and numbers
-        if sharp:
-            self.ntoc = {0: 'C', 1: 'C#', 2: 'D', 3: 'D#', 4: 'E', 5: 'F',
-                         6: 'F#', 7: 'G', 8: 'G#', 9: 'A', 10: 'A#', 11: 'B', -1: ''}
-        else:
-            self.ntoc = {0: 'C', 1: 'Db', 2: 'D', 3: 'Eb', 4: 'E', 5: 'F',
-                         6: 'Gb', 7: 'G', 8: 'Ab', 9: 'A', 10: 'Bb', 11: 'B', -1: ''}
+        self.ntoc = {0: 'C', 1: 'C#' if sharp[0] else 'Db', 2: 'D', 3: 'D#' if sharp[1] else 'Eb', 4: 'E', 5: 'F',
+                     6: 'F#' if sharp[2] else 'Gb', 7: 'G', 8: 'G#' if sharp[3] else 'Ab', 9: 'A',
+                     10: 'A#' if sharp[4] else 'Bb', 11: 'B', -1: ''}
 
         self.cton = {'Cb': 11, 'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
                      'E': 4, 'E#': 5, 'Fb': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7,
